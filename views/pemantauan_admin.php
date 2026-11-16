@@ -335,4 +335,4 @@ $current_page = 'peta';
         window.filterMarker = renderMarkers;
     </script>
 </body>
-</html>
+</html>  
