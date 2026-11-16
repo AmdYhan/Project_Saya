@@ -24,6 +24,30 @@ $current_page = 'patroli';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Animasi Masuk Bertahap (Staggered Slide Up & Fade In) */
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-entry {
+            opacity: 0;
+            animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.06s; }
+        .delay-200 { animation-delay: 0.12s; }
+        .delay-300 { animation-delay: 0.18s; }
+        .delay-400 { animation-delay: 0.24s; }
+        .delay-500 { animation-delay: 0.30s; }
+        .delay-600 { animation-delay: 0.36s; }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-[#0d1c30] pb-24">
@@ -53,8 +77,8 @@ $current_page = 'patroli';
         <!-- Action diarahkan ke folder process/ -->
         <form action="../process/proses_tambah_patroli.php" method="POST" enctype="multipart/form-data" class="space-y-4">
             
-            <!-- Lokasi / Segment Patroli dengan Format Alamat Lengkap -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
+            <!-- 1. Lokasi / Segment Patroli -->
+            <div class="animate-entry delay-100 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
                 <div class="flex items-center justify-between">
                     <label class="block text-xs font-extrabold text-[#0d1c30]">Lokasi / Area Patroli *</label>
                     <span class="text-[10px] text-slate-400 font-medium">Otomatis dari GPS / Edit Manual</span>
@@ -64,8 +88,8 @@ $current_page = 'patroli';
                 </div>
             </div>
 
-            <!-- KOORDINAT REALTIME GNSS / GPS -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+            <!-- 2. KOORDINAT REALTIME GNSS / GPS -->
+            <div class="animate-entry delay-200 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 relative">
@@ -100,8 +124,8 @@ $current_page = 'patroli';
                 <input type="hidden" name="akurasi_gps" id="akurasi_gps" required>
             </div>
             
-            <!-- KONDISI FISIK JALUR -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+            <!-- 3. KONDISI FISIK JALUR -->
+            <div class="animate-entry delay-300 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
                 <div class="flex items-center justify-between">
                     <label class="block text-xs font-extrabold text-[#0d1c30]">Kondisi Fisik Jalur *</label>
                     <span id="badge-kondisi" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-500">Pilih Status</span>
@@ -111,39 +135,40 @@ $current_page = 'patroli';
                 <input type="hidden" name="kondisi_fisik" id="input_kondisi" required>
 
                 <div class="grid grid-cols-3 gap-2 pt-1">
-                    <button type="button" onclick="pilihKondisi('Baik')" id="btn-Baik" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100">
+                    <button type="button" onclick="pilihKondisi('Baik')" id="btn-Baik" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100 active:scale-95">
                         <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span> Baik
                     </button>
-                    <button type="button" onclick="pilihKondisi('Waspada')" id="btn-Waspada" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100">
+                    <button type="button" onclick="pilihKondisi('Waspada')" id="btn-Waspada" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100 active:scale-95">
                         <span class="material-symbols-outlined text-[16px] text-amber-500">warning</span> Waspada
                     </button>
-                    <button type="button" onclick="pilihKondisi('Rawan')" id="btn-Rawan" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100">
+                    <button type="button" onclick="pilihKondisi('Rawan')" id="btn-Rawan" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100 active:scale-95">
                         <span class="material-symbols-outlined text-[16px] text-rose-600">error</span> Rawan
                     </button>
                 </div>
             </div>
 
-            <!-- POTENSI ANCAMAN / JENIS KENDALA -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
+            <!-- 4. POTENSI ANCAMAN / JENIS KENDALA -->
+            <div class="animate-entry delay-400 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
                 <label class="block text-xs font-extrabold text-[#0d1c30]">Potensi Ancaman / Jenis Kendala</label>
                 <select name="potensi_ancaman" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#0d1c30] focus:outline-none focus:border-[#0052cc] transition">
                     <option value="">-- Pilih Potensi Ancaman (Opsional) --</option>
                     <option value="Pohon Rawan Tumbang">Pohon Rawan Tumbang</option>
                     <option value="Aktivitas Galian / Konstruksi Warga">Aktivitas Galian / Konstruksi Warga</option>
                     <option value="Kabel Kendur / Mendekati Tanah">Kabel Kendur / Mendekati Tanah</option>
-                    <option value="Patok DATEK Hilang / Rusak">Patok DATEK Hilang / Rusak</option>
+                     <option value="Tiang Miring / Hampir Rebah / Patah">Tiang Miring / Hampir Rebah / Patah</option>
+                    <option value="Kabel Putus / Terkelupas / Vandalisme">Kabel Putus / Terkelupas / Vandalisme</option>
                     <option value="Lainnya">Lainnya</option>
                 </select>
             </div>
 
-            <!-- CATATAN TAMBAHAN -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
+            <!-- 5. CATATAN TAMBAHAN -->
+            <div class="animate-entry delay-500 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
                 <label class="block text-xs font-extrabold text-[#0d1c30]">Catatan Tambahan / Temuan Lapangan</label>
                 <textarea name="catatan" rows="3" placeholder="Tuliskan detail temuan, kendala, atau kondisi patok DATEK..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-[#0d1c30] focus:outline-none focus:border-[#0052cc] transition"></textarea>
             </div>
 
-            <!-- FOTO BUKTI LAPANGAN -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+            <!-- 6. FOTO BUKTI LAPANGAN -->
+            <div class="animate-entry delay-600 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
                 <label class="block text-xs font-extrabold text-[#0d1c30]">Foto Bukti Lapangan *</label>
                 
                 <div class="grid grid-cols-2 gap-2">
@@ -172,7 +197,7 @@ $current_page = 'patroli';
             </div>
 
             <!-- Tombol Kirim -->
-            <button type="submit" id="btn-submit" class="w-full py-3.5 bg-[#0052cc] text-white font-extrabold text-xs rounded-2xl shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+            <button type="submit" id="btn-submit" class="animate-entry w-full py-3.5 bg-[#0052cc] text-white font-extrabold text-xs rounded-2xl shadow-md active:scale-95 transition flex items-center justify-center gap-1.5 hover:bg-blue-700" style="animation-delay: 0.42s;">
                 <span class="material-symbols-outlined text-[18px]">send</span>
                 Kirim Laporan Patroli
             </button>
@@ -278,7 +303,7 @@ $current_page = 'patroli';
             
             if (akurasiMeter > 50) {
                 akurasiBadge.className = "px-2.5 py-0.5 bg-amber-50 text-amber-600 font-bold rounded-full border border-amber-200";
-                akurasiBadge.textContent = "Akurasi Lemah (±" + akurasiMeter + "m)";
+                akurasiBadge.textContent = "Akurasi Rendah (±" + akurasiMeter + "m)";
                 lokasiDetilText.textContent = "⚠️ Akurasi rendah. Mohon pindah ke area terbuka.";
                 gpsIndicator.className = "absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white";
             } else {
@@ -303,7 +328,6 @@ $current_page = 'patroli';
                     let provinsi = addr.state || '';
                     let kodepos = addr.postcode || '';
 
-                    // Menyusun format teks lokasi selaras dengan standar mitra
                     let alamatLengkap = `${jalan ? jalan + ', ' : ''}${desaKel ? desaKel + ', ' : ''}${kecamatan ? 'Kec. ' + kecamatan + ', ' : ''}${kabupaten ? 'Kabupaten ' + kabupaten + ', ' : ''}${provinsi} ${kodepos}`.trim();
                     
                     inputLokasiArea.value = alamatLengkap;
@@ -325,7 +349,7 @@ $current_page = 'patroli';
             document.getElementById('input_kondisi').value = nilai;
             ['Baik', 'Waspada', 'Rawan'].forEach(function(kondisi) {
                 const btn = document.getElementById('btn-' + kondisi);
-                btn.className = "py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100";
+                btn.className = "py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100 active:scale-95";
             });
 
             const btnAktif = document.getElementById('btn-' + nilai);
@@ -371,7 +395,7 @@ $current_page = 'patroli';
     </script>
 
     <!-- BOTTOM NAVBAR 4 MENU -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 py-2 px-6 flex justify-around items-center z-30 max-w-md mx-auto">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 py-2 px-6 flex justify-around items-center z-30 max-w-md mx-auto shadow-lg">
         <a href="beranda.php" class="flex flex-col items-center <?php echo ($current_page == 'beranda') ? 'text-[#0052cc] font-bold' : 'text-[#5E6C84]'; ?>">
             <span class="material-symbols-outlined text-[22px]" <?php echo ($current_page == 'beranda') ? 'style="font-variation-settings: \'FILL\' 1;"' : ''; ?>>grid_view</span>
             <span class="text-[10px] mt-0.5">Beranda</span>

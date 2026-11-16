@@ -77,6 +77,28 @@ $current_page = 'peta';
             height: 100vh !important;
             border-radius: 0 !important;
         }
+
+        /* Animasi Masuk Bertahap yang Lembut & Pelan (Smooth & Slow Fade In Slide Up) */
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-entry {
+            opacity: 0;
+            animation: slideUpFade 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
     </style>
 </head>
 <body class="text-[#0d1c30] pb-28">
@@ -88,16 +110,17 @@ $current_page = 'peta';
                 <h1 class="font-extrabold text-sm text-[#0d1c30] leading-tight">SAMARINDA OPS</h1>
                 <p class="text-[10px] text-slate-400 font-medium">Peta Jalur</p>
             </div>
-            <a href="profil_admin.php" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
-                <span class="material-symbols-outlined text-[20px]">person</span>
+            <!-- Ikon Profil Header Atas (Menggunakan Gaya Lingkaran Biru) -->
+            <a href="profil_admin.php" class="w-10 h-10 rounded-full bg-blue-50/80 border border-blue-100 flex items-center justify-center text-[#0052cc] active:scale-95 transition shadow-sm">
+                <span class="material-symbols-outlined text-[22px]">person</span>
             </a>
         </div>
     </header>
 
     <main id="mainContainer" class="max-w-md mx-auto p-4 space-y-4">
         
-        <!-- TITLE GIS & FILTER BADGE -->
-        <div class="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+        <!-- 1. TITLE GIS & FILTER BADGE -->
+        <div class="animate-entry delay-100 bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-xl bg-[#0052cc]/10 text-[#0052cc] flex items-center justify-center">
@@ -120,17 +143,15 @@ $current_page = 'peta';
             </div>
         </div>
 
-        <!-- CONTAINER PETA INTERAKTIF -->
-        <div id="mapWrapper" class="bg-white p-3 rounded-3xl border border-slate-100 shadow-sm relative transition-all duration-300 space-y-2.5">
+        <!-- 2. CONTAINER PETA INTERAKTIF -->
+        <div id="mapWrapper" class="animate-entry delay-200 bg-white p-3 rounded-3xl border border-slate-100 shadow-sm relative transition-all duration-300 space-y-2.5">
             
-            <!-- KONTROL ATAS PETA (Dibuat Aman & Responsif Agar Tidak Keluar Border) -->
+            <!-- KONTROL ATAS PETA -->
             <div class="flex flex-wrap items-center justify-between gap-1.5 z-[1000] relative px-0.5">
-                <!-- Koordinat GPS Center -->
                 <div class="bg-white/95 backdrop-blur-md border border-slate-200 px-2.5 py-1 rounded-xl shadow-sm text-[10px] font-bold text-slate-700 flex items-center gap-1">
                     <span class="material-symbols-outlined text-[12px] text-[#0052cc]">my_location</span> -0.5021, 117.1536
                 </div>
 
-                <!-- Tombol Kanan Atas (OSP, Heatmap, Tema & Fullscreen) -->
                 <div class="flex flex-wrap items-center gap-1">
                     <span class="bg-white/95 backdrop-blur-md border border-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1 rounded-xl shadow-sm flex items-center gap-0.5">
                         <span class="material-symbols-outlined text-[12px]">network_node</span> OSP
@@ -139,14 +160,12 @@ $current_page = 'peta';
                         <span class="material-symbols-outlined text-[12px]">heatmap</span> Heatmap
                     </span>
                     
-                    <!-- Dropdown Tema -->
                     <select id="mapThemeSelect" onchange="ubahTemaPeta(this.value)" class="bg-white/95 backdrop-blur-md border border-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1 rounded-xl shadow-sm focus:outline-none cursor-pointer">
                         <option value="satelit">🛰️ Satelit</option>
                         <option value="standard">🗺️ Standar</option>
                         <option value="topo">⛰️ Topo</option>
                     </select>
 
-                    <!-- Tombol Full Screen -->
                     <button onclick="toggleFullScreen()" class="w-7 h-7 bg-white/95 backdrop-blur-md border border-slate-200 text-slate-700 rounded-xl shadow-sm flex items-center justify-center hover:bg-slate-100 transition cursor-pointer" title="Layar Penuh">
                         <span id="fsIcon" class="material-symbols-outlined text-[14px]">fullscreen</span>
                     </button>
@@ -155,15 +174,14 @@ $current_page = 'peta';
 
             <div id="map"></div>
 
-            <!-- Floating Badge Koridor di Peta Bawah -->
             <div class="absolute bottom-5 left-5 z-[1000] bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl shadow border border-slate-200 flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
                 <span class="w-2 h-2 rounded-full bg-[#0052cc]"></span> Koridor FO: Palaran - Seberang
             </div>
         </div>
 
-        <!-- KARTU DETAIL LAPORAN TERBARU -->
+        <!-- 3. KARTU DETAIL LAPORAN TERBARU -->
         <?php if ($latest_report) : ?>
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative">
+        <div class="animate-entry delay-300 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative hover:shadow-md transition duration-200">
             <div class="flex justify-between items-center">
                 <span class="bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> <?php echo htmlspecialchars($latest_report['potensi_ancaman'] ?: 'KRITIS (Rawan Putus)'); ?>
@@ -201,14 +219,14 @@ $current_page = 'peta';
                 </div>
             </div>
 
-            <a href="detail_laporan_admin.php?id=<?php echo $latest_report['id']; ?>" class="w-full bg-[#0052cc]/10 hover:bg-[#0052cc]/20 text-[#0052cc] font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+            <a href="detail_laporan_admin.php?id=<?php echo $latest_report['id']; ?>" class="w-full bg-[#0052cc]/10 hover:bg-[#0052cc]/20 text-[#0052cc] font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98]">
                 <span class="material-symbols-outlined text-[18px]">visibility</span> Detail Tiket
             </a>
         </div>
         <?php endif; ?>
 
-        <!-- RINGKASAN STATUS TITIK TKP -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+        <!-- 4. RINGKASAN STATUS TITIK TKP -->
+        <div class="animate-entry delay-400 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-xs text-slate-700">RINGKASAN STATUS <?php echo $total_tkp; ?> TITIK TKP</h3>
                 <a href="laporan_admin.php" class="text-[11px] font-bold text-[#0052cc] hover:underline flex items-center gap-0.5">
@@ -217,19 +235,19 @@ $current_page = 'peta';
             </div>
 
             <div class="grid grid-cols-3 gap-2">
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center transition hover:shadow-sm">
                     <div class="flex items-center justify-center gap-1 text-[11px] font-bold text-rose-600 mb-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> 0<?php echo $q_kritis; ?>
                     </div>
                     <p class="text-[10px] text-slate-500 font-medium">Kritis Rawan</p>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center transition hover:shadow-sm">
                     <div class="flex items-center justify-center gap-1 text-[11px] font-bold text-amber-600 mb-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 0<?php echo $q_waspada; ?>
                     </div>
                     <p class="text-[10px] text-slate-500 font-medium">Waspada Rimbun</p>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center transition hover:shadow-sm">
                     <div class="flex items-center justify-center gap-1 text-[11px] font-bold text-emerald-600 mb-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 0<?php echo $q_normal; ?>
                     </div>
@@ -240,12 +258,12 @@ $current_page = 'peta';
 
     </main>
 
-    <!-- BOTTOM NAVBAR ADMIN -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-6 flex justify-around items-center z-30 max-w-md mx-auto">
-        <a href="dashboard_admin.php" class="flex flex-col items-center text-slate-400"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="text-[10px] mt-0.5">Beranda</span></a>
+    <!-- BOTTOM NAVBAR (Dikembalikan ke Standar Semula) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-6 flex justify-around items-center z-30 max-w-md mx-auto shadow-lg">
+        <a href="dashboard_admin.php" class="flex flex-col items-center text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="text-[10px] mt-0.5">Beranda</span></a>
         <a href="pemantauan_admin.php" class="flex flex-col items-center text-[#0052cc] font-bold"><span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">map</span><span class="text-[10px] mt-0.5">Peta Jalur</span></a>
-        <a href="laporan_admin.php" class="flex flex-col items-center text-slate-400"><span class="material-symbols-outlined text-[22px]">assignment</span><span class="text-[10px] mt-0.5">Laporan</span></a>
-        <a href="profil_admin.php" class="flex flex-col items-center text-slate-400"><span class="material-symbols-outlined text-[22px]">person</span><span class="text-[10px] mt-0.5">Profil</span></a>
+        <a href="laporan_admin.php" class="flex flex-col items-center text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[22px]">assignment</span><span class="text-[10px] mt-0.5">Laporan</span></a>
+        <a href="profil_admin.php" class="flex flex-col items-center text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[22px]">person</span><span class="text-[10px] mt-0.5">Profil</span></a>
     </nav>
 
     <!-- SCRIPT PETA LEAFLET -->

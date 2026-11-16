@@ -29,6 +29,25 @@ $current_page = 'riwayat';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+
+        /* Animasi Masuk Bertahap (Staggered Slide Up & Fade In) */
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-entry {
+            opacity: 0;
+            animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.08s; }
     </style>
 </head>
 <body class="text-[#0d1c30] pb-28">
@@ -54,7 +73,7 @@ $current_page = 'riwayat';
 
     <!-- KONTEN UTAMA RIWAYAT -->
     <main class="max-w-md mx-auto p-4 space-y-3.5">
-        <div class="flex items-center justify-between mb-1 px-1">
+        <div class="animate-entry delay-100 flex items-center justify-between mb-1 px-1">
             <h2 class="font-extrabold text-sm text-[#0d1c30] tracking-tight">Daftar Laporan Saya</h2>
             <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
                 <?php echo mysqli_num_rows($query_riwayat); ?> Laporan
@@ -62,7 +81,10 @@ $current_page = 'riwayat';
         </div>
 
         <?php if ($query_riwayat && mysqli_num_rows($query_riwayat) > 0): ?>
-            <?php while ($row = mysqli_fetch_assoc($query_riwayat)): ?>
+            <?php 
+            $item_delay = 0.16;
+            while ($row = mysqli_fetch_assoc($query_riwayat)): 
+            ?>
                 <?php 
                     $potensi = $row['potensi_ancaman'] ?: 'KRITIS (Rawan Putus)';
                     $nomor_tiket = '#PAT-2026-' . str_pad($row['id'], 3, '0', STR_PAD_LEFT);
@@ -87,7 +109,7 @@ $current_page = 'riwayat';
                         $kondisi_class = "text-rose-600 font-bold";
                     }
                 ?>
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative hover:shadow-md transition">
+                <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative hover:shadow-md transition duration-200" style="animation-delay: <?php echo $item_delay; ?>s;">
                     
                     <!-- KELOMPOK HEADER: Badge Ancaman & Nomor Tiket + Status -->
                     <div class="flex items-start justify-between gap-2">
@@ -136,27 +158,30 @@ $current_page = 'riwayat';
                     <!-- BARIS TOMBOL AKSI YANG BERSIH & PROPORSIONAL -->
                     <div class="flex items-center gap-2 pt-1">
                         <!-- Tombol Utama: Detail Tiket -->
-                        <a href="detail_laporan.php?id=<?php echo $row['id']; ?>" class="flex-1 bg-blue-50 hover:bg-blue-100 text-[#0052cc] font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <a href="detail_laporan.php?id=<?php echo $row['id']; ?>" class="flex-1 bg-blue-50 hover:bg-blue-100 text-[#0052cc] font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98]">
                             <span class="material-symbols-outlined text-[16px]">visibility</span> Detail Tiket
                         </a>
 
-                        <!-- Tombol Revisi (Hanya muncul jika status ditolak / perlu revisi) -->
-                        <?php if ($status_lower == 'ditolak' || $status_lower == 'rejected' || $status_lower == 'perlu revisi'): ?>
-                            <a href="edit_laporan.php?id=<?php echo $row['id']; ?>" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold px-3 py-2.5 rounded-xl text-xs flex items-center gap-1 transition" title="Revisi Laporan">
-                                <span class="material-symbols-outlined text-[16px]">edit</span> Revisi
+                        <!-- Tombol Edit Mandiri (Muncul selama status belum disetujui) -->
+                        <?php if ($status_lower != 'disetujui' && $status_lower != 'approved' && $status_lower != 'selesai'): ?>
+                            <a href="edit_laporan.php?id=<?php echo $row['id']; ?>" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold px-3 py-2.5 rounded-xl text-xs flex items-center gap-1 transition active:scale-[0.98]" title="Edit Laporan">
+                                <span class="material-symbols-outlined text-[16px]">edit</span> Edit
                             </a>
                         <?php endif; ?>
 
-                        <!-- Tombol Hapus (Dibuat minimalis berbentuk ikon berbingkai rapi) -->
-                        <a href="../process/proses_hapus_laporan.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan patroli ini?')" class="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center transition border border-rose-100 flex-shrink-0" title="Hapus Laporan">
+                        <!-- Tombol Hapus -->
+                        <a href="../process/proses_hapus_laporan.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan patroli ini?')" class="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center transition border border-rose-100 flex-shrink-0 active:scale-[0.98]" title="Hapus Laporan">
                             <span class="material-symbols-outlined text-[18px]">delete</span>
                         </a>
                     </div>
 
                 </div>
-            <?php endwhile; ?>
+            <?php 
+            $item_delay += 0.08;
+            endwhile; 
+            ?>
         <?php else: ?>
-            <div class="text-center py-12 bg-white rounded-2xl border border-slate-100 p-6 space-y-3">
+            <div class="animate-entry delay-100 text-center py-12 bg-white rounded-2xl border border-slate-100 p-6 space-y-3">
                 <div class="w-16 h-16 bg-blue-50 text-[#0052cc] rounded-full flex items-center justify-center mx-auto">
                     <span class="material-symbols-outlined text-[32px]">history_toggle_off</span>
                 </div>
@@ -168,7 +193,7 @@ $current_page = 'riwayat';
     </main>
 
     <!-- BOTTOM NAVBAR -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-6 flex justify-around items-center z-30 max-w-md mx-auto">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-6 flex justify-around items-center z-30 max-w-md mx-auto shadow-lg">
         <a href="beranda.php" class="flex flex-col items-center <?php echo ($current_page == 'beranda') ? 'text-[#0052cc] font-bold' : 'text-slate-400'; ?>">
             <span class="material-symbols-outlined text-[22px]" <?php echo ($current_page == 'beranda') ? 'style="font-variation-settings: \'FILL\' 1;"' : ''; ?>>grid_view</span>
             <span class="text-[10px] mt-0.5">Beranda</span>

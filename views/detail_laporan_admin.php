@@ -28,10 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $aksi = $_POST['aksi'] ?? '';
     $catatan_disposisi = mysqli_real_escape_string($conn, $_POST['catatan_disposisi'] ?? '');
     
-    $status_baru = ($aksi === 'setujui') ? 'Disetujui' : 'Perlu Revisi';
+    // Ambil username admin/supervisor yang sedang aktif login saat ini
+    $admin_pengaju = $_SESSION['username'];
     
-    // Update status dan catatan disposisi ke database
-    mysqli_query($conn, "UPDATE laporan_patroli SET status_laporan = '$status_baru', catatan = CONCAT(catatan, ' [Catatan Supervisor: $catatan_disposisi]') WHERE id = $id_laporan");
+    if ($aksi === 'setujui') {
+        $status_baru = 'Disetujui';
+        // Jika disetujui, update status dan catatan disposisi saja (admin_revisi dikosongkan/biarkan)
+        mysqli_query($conn, "UPDATE laporan_patroli SET status_laporan = '$status_baru', catatan = CONCAT(catatan, ' [Catatan Supervisor: $catatan_disposisi]') WHERE id = $id_laporan");
+    } else {
+        $status_baru = 'Perlu Revisi';
+        // Jika minta revisi, update status, catatan, DAN simpan otomatis nama admin ke kolom admin_revisi
+        mysqli_query($conn, "UPDATE laporan_patroli SET status_laporan = '$status_baru', catatan = CONCAT(catatan, ' [Catatan Supervisor: $catatan_disposisi]'), admin_revisi = '$admin_pengaju' WHERE id = $id_laporan");
+    }
     
     echo "<script>alert('Status laporan berhasil diperbarui menjadi: $status_baru'); window.location.href='laporan_admin.php';</script>";
     exit();

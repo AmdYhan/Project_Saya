@@ -43,6 +43,28 @@ $current_page = 'beranda';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6f9; }
+
+        /* Animasi Masuk Bertahap (Staggered Slide Up & Fade In) */
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-entry {
+            opacity: 0;
+            animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.08s; }
+        .delay-200 { animation-delay: 0.16s; }
+        .delay-300 { animation-delay: 0.24s; }
+        .delay-400 { animation-delay: 0.32s; }
     </style>
 </head>
 <body class="text-[#0d1c30] pb-28">
@@ -62,21 +84,19 @@ $current_page = 'beranda';
             </a>
         </div>
     </header>
+
     <!-- KONTEN UTAMA -->
     <main class="max-w-md mx-auto p-4 space-y-4">
         
-        <!-- KARTU PROFIL TEKNISI (GRADASI BIRU COMPACT & MODERN) -->
-        <div class="relative bg-gradient-to-r from-[#0052cc] via-blue-600 to-indigo-700 text-white rounded-2xl p-4 shadow-md shadow-blue-500/20 overflow-hidden flex items-center justify-between">
-            <!-- Efek Cahaya Halus di Background -->
+        <!-- 1. KARTU PROFIL TEKNISI (MUNCUL PERTAMA) -->
+        <div class="animate-entry delay-100 relative bg-gradient-to-r from-[#0052cc] via-blue-600 to-indigo-700 text-white rounded-2xl p-4 shadow-md shadow-blue-500/20 overflow-hidden flex items-center justify-between">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div class="flex items-center gap-3 relative z-10">
-                <!-- Ikon Karakter Teknisi -->
                 <div class="w-12 h-12 bg-white/15 backdrop-blur-md text-white rounded-2xl flex items-center justify-center border border-white/20 shadow-inner flex-shrink-0">
                     <span class="material-symbols-outlined text-[26px]">engineering</span>
                 </div>
                 
-                <!-- Informasi Nama, NIP & Role -->
                 <div class="space-y-0.5">
                     <div class="flex items-center gap-2">
                         <h2 class="font-extrabold text-base tracking-tight text-white"><?php echo htmlspecialchars(ucfirst($user['username'] ?? 'Teknisi')); ?></h2>
@@ -90,16 +110,15 @@ $current_page = 'beranda';
                 </div>
             </div>
 
-            <!-- Status Online -->
             <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 rounded-full flex-shrink-0 relative z-10">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="text-[10px] font-extrabold text-emerald-100">Online</span>
             </div>
         </div>
 
-        <!-- 3 KOTAK STATISTIK STATUS LAPORAN -->
-        <div class="grid grid-cols-3 gap-3">
-            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md">
+        <!-- 2. 3 KOTAK STATISTIK STATUS LAPORAN (MUNCUL KEDUA) -->
+        <div class="animate-entry delay-200 grid grid-cols-3 gap-3">
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md hover:-translate-y-0.5 duration-200">
                 <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto border border-emerald-100">
                     <span class="material-symbols-outlined text-[16px]">check_circle</span>
                 </div>
@@ -109,7 +128,7 @@ $current_page = 'beranda';
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md">
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md hover:-translate-y-0.5 duration-200">
                 <div class="w-8 h-8 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mx-auto border border-amber-100">
                     <span class="material-symbols-outlined text-[16px]">hourglass_top</span>
                 </div>
@@ -119,7 +138,7 @@ $current_page = 'beranda';
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md">
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md hover:-translate-y-0.5 duration-200">
                 <div class="w-8 h-8 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mx-auto border border-rose-100">
                     <span class="material-symbols-outlined text-[16px]">cancel</span>
                 </div>
@@ -130,16 +149,14 @@ $current_page = 'beranda';
             </div>
         </div>
 
-        <!-- BANNER AKSI UTAMA DENGAN TEKS DEKRIPSI BARU -->
-        <div class="bg-gradient-to-br from-[#0052cc] to-blue-700 text-white rounded-3xl p-5 shadow-md shadow-blue-500/20 space-y-3.5 relative overflow-hidden">
+        <!-- 3. BANNER AKSI UTAMA (MUNCUL KETIGA) -->
+        <div class="animate-entry delay-300 bg-gradient-to-br from-[#0052cc] to-blue-700 text-white rounded-3xl p-5 shadow-md shadow-blue-500/20 space-y-3.5 relative overflow-hidden">
             <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
             <div class="space-y-1.5 relative z-10">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-[11px] font-semibold text-blue-50 border border-white/10">
                     <span class="material-symbols-outlined text-[14px]">shield</span> OSP Maintenance & Monitoring
                 </span>
-                <!-- Sapaan dan Ajakan Patroli -->
                 <h3 class="font-extrabold text-base tracking-tight pt-0.5">Selamat Datang, <?php echo htmlspecialchars(ucfirst($user['username'] ?? 'Teknisi')); ?>! Siap Melakukan Patroli Jalur?</h3>
-                <!-- Kalimat baru yang profesional & dinamis -->
                 <p class="text-xs text-blue-100 leading-relaxed font-medium">Pastikan jaringan fiber optik aman dari potensi gangguan fisik serta catat setiap temuan di lapangan hari ini.</p>
             </div>
             <a href="form_patroli.php" class="relative z-10 block w-full py-3 bg-white text-[#0052cc] text-center font-extrabold text-xs rounded-2xl shadow-sm active:scale-95 transition flex items-center justify-center gap-1.5 hover:bg-blue-50">
@@ -148,15 +165,18 @@ $current_page = 'beranda';
             </a>
         </div>
 
-        <!-- RIWAYAT LAPORAN SAYA -->
-        <div class="space-y-3 pt-1">
+        <!-- 4. RIWAYAT LAPORAN SAYA (MUNCUL KEEMPAT) -->
+        <div class="animate-entry delay-400 space-y-3 pt-1">
             <div class="flex items-center justify-between px-1">
                 <h3 class="font-extrabold text-sm text-[#0d1c30]">Riwayat Laporan Saya</h3>
                 <a href="riwayat.php" class="text-xs font-bold text-[#0052cc] hover:underline flex items-center gap-0.5">Lihat Semua <span class="material-symbols-outlined text-[14px]">arrow_forward</span></a>
             </div>
 
             <?php if ($query_riwayat && mysqli_num_rows($query_riwayat) > 0): ?>
-                <?php while ($row = mysqli_fetch_assoc($query_riwayat)): ?>
+                <?php 
+                $item_delay = 0.38; 
+                while ($row = mysqli_fetch_assoc($query_riwayat)): 
+                ?>
                     <?php 
                         $potensi = $row['potensi_ancaman'] ?: 'KRITIS (Rawan Putus)';
                         $nomor_tiket = '#PAT-2026-' . str_pad($row['id'], 3, '0', STR_PAD_LEFT);
@@ -179,7 +199,7 @@ $current_page = 'beranda';
                             $kondisi_class = "text-rose-600 font-bold";
                         }
                     ?>
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative">
+                    <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative transition hover:shadow-md duration-200" style="animation-delay: <?php echo $item_delay; ?>s;">
                         <div class="flex justify-between items-center">
                             <span class="bg-blue-50 text-[#0052cc] border border-blue-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-[#0052cc]"></span> 
@@ -220,11 +240,14 @@ $current_page = 'beranda';
                             </div>
                         </div>
 
-                        <a href="detail_laporan.php?id=<?php echo $row['id']; ?>" class="w-full bg-[#0052cc]/10 hover:bg-[#0052cc]/20 text-[#0052cc] font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <a href="detail_laporan.php?id=<?php echo $row['id']; ?>" class="w-full bg-[#0052cc]/10 hover:bg-[#0052cc]/20 text-[#0052cc] font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98]">
                             <span class="material-symbols-outlined text-[18px]">visibility</span> Detail Tiket
                         </a>
                     </div>
-                <?php endwhile; ?>
+                <?php 
+                $item_delay += 0.08;
+                endwhile; 
+                ?>
             <?php else: ?>
                 <div class="text-center py-10 bg-white rounded-2xl border border-slate-100 p-4 space-y-2.5 shadow-sm">
                     <div class="w-12 h-12 bg-blue-50 text-[#0052cc] rounded-full flex items-center justify-center mx-auto border border-blue-100">
