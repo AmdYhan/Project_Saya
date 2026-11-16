@@ -90,14 +90,14 @@ $current_page = 'riwayat';
                     $nomor_tiket = '#PAT-2026-' . str_pad($row['id'], 3, '0', STR_PAD_LEFT);
                     $status_laporan = trim($row['status_laporan'] ?? 'Menunggu Verifikasi');
                     
-                    // Logika Pewarnaan Status: Disetujui = Hijau | Ditolak = Merah | Pending = Oren
+                    // Logika Pewarnaan Status: Disetujui = Hijau | Revisi = Ungu/Indigo | Pending = Oren/Amber
                     $status_lower = strtolower($status_laporan);
                     if ($status_lower == 'disetujui' || $status_lower == 'approved' || $status_lower == 'selesai') {
                         $status_class = "bg-emerald-100 text-emerald-800 border-emerald-300";
                     } elseif ($status_lower == 'revisi' || $status_lower == 'perlu revisi' || $status_lower == 'ditolak' || $status_lower == 'rejected') {
-                        $status_class = "bg-indigo-100 text-indigo-800 border-indigo-300"; // Diubah ke ungu/indigo
+                        $status_class = "bg-indigo-100 text-indigo-800 border-indigo-300"; 
                     } else {
-                        $status_class = "bg-amber-100 text-amber-800 border-amber-300"; // Pending tetap kuning/amber
+                        $status_class = "bg-amber-100 text-amber-800 border-amber-300"; 
                     }
 
                     // Logika Pewarnaan Kondisi Fisik
@@ -111,23 +111,25 @@ $current_page = 'riwayat';
                 ?>
                 <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative hover:shadow-md transition duration-200" style="animation-delay: <?php echo $item_delay; ?>s;">
                     
-                    <!-- KELOMPOK HEADER: Badge Ancaman & Nomor Tiket + Status -->
-                    <div class="flex items-start justify-between gap-2">
-                        <span class="bg-blue-50 text-[#0052cc] border border-blue-200 text-[10px] font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-xs">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#0052cc]"></span> 
-                            <?php echo htmlspecialchars($potensi); ?>
+                    <!-- BARIS ATAS: Nomor Tiket & Status (Rapi & Tidak Saling Tabrak) -->
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <span class="text-xs font-extrabold text-slate-500 tracking-wide flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[15px] text-blue-600">confirmation_number</span>
+                            <?php echo $nomor_tiket; ?>
                         </span>
-                        
-                        <div class="text-right flex-shrink-0">
-                            <span class="block text-[10px] font-bold text-slate-400"><?php echo $nomor_tiket; ?></span>
-                            <span class="inline-block mt-0.5 text-[10px] font-extrabold px-2 py-0.5 rounded-md border <?php echo $status_class; ?>">
-                                <?php echo htmlspecialchars($status_laporan); ?>
-                            </span>
-                        </div>
+                        <span class="text-[10px] font-extrabold px-3 py-1 rounded-full border shadow-2xs <?php echo $status_class; ?>">
+                            <?php echo htmlspecialchars($status_laporan); ?>
+                        </span>
                     </div>
 
-                    <!-- LOKASI & TITIK KOORDINAT -->
-                    <div class="space-y-0.5">
+                    <!-- KONTEN TENGAH: Potensi Ancaman, Lokasi & Titik Koordinat -->
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#0052cc]"></span>
+                            <span class="text-xs font-extrabold text-[#0052cc]">
+                                <?php echo htmlspecialchars($potensi); ?>
+                            </span>
+                        </div>
                         <h3 class="font-extrabold text-sm text-[#0d1c30] leading-snug"><?php echo htmlspecialchars($row['lokasi_area']); ?></h3>
                         <p class="text-[11px] text-slate-500 flex items-center gap-1">
                             <span class="material-symbols-outlined text-[14px] text-rose-500 flex-shrink-0">location_on</span>
