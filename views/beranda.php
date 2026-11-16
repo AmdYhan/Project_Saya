@@ -288,4 +288,4 @@ $current_page = 'beranda';
     </nav>
 
 </body>
-</html>
+</html>  
