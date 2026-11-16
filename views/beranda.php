@@ -21,11 +21,11 @@ $id_teknisi = $user['id'] ?? 0;
 // Statistik status laporan 
 $q_approved = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Disetujui' OR status_laporan = 'Approved')"); 
 $q_pending = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Menunggu Verifikasi' OR status_laporan = 'Pending' OR status_laporan = '')"); 
-$q_rejected = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Ditolak' OR status_laporan = 'Rejected')"); 
+$q_revisi = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Revisi' OR status_laporan = 'Perlu Revisi' OR status_laporan = 'Ditolak' OR status_laporan = 'Rejected')"); 
 
 $tot_approved = ($q_approved) ? (mysqli_fetch_assoc($q_approved)['total'] ?? 0) : 0; 
 $tot_pending = ($q_pending) ? (mysqli_fetch_assoc($q_pending)['total'] ?? 0) : 0; 
-$tot_rejected = ($q_rejected) ? (mysqli_fetch_assoc($q_rejected)['total'] ?? 0) : 0; 
+$tot_revisi = ($q_revisi) ? (mysqli_fetch_assoc($q_revisi)['total'] ?? 0) : 0; 
 
 // Ambil riwayat laporan terbaru (maksimal 3) beserta data NIP user
 $query_riwayat = mysqli_query($conn, "SELECT l.*, u.nip FROM laporan_patroli l LEFT JOIN users u ON l.username = u.username WHERE l.username='$username' ORDER BY l.id DESC LIMIT 3"); 
@@ -139,12 +139,12 @@ $current_page = 'beranda';
             </div>
 
             <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-100 text-center space-y-1 transition hover:shadow-md hover:-translate-y-0.5 duration-200">
-                <div class="w-8 h-8 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mx-auto border border-rose-100">
-                    <span class="material-symbols-outlined text-[16px]">cancel</span>
+                <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto border border-indigo-100">
+                    <span class="material-symbols-outlined text-[16px]">edit_note</span>
                 </div>
                 <div>
-                    <h3 class="font-extrabold text-base text-rose-600"><?php echo $tot_rejected; ?></h3>
-                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Rejected</p>
+                    <h3 class="font-extrabold text-base text-indigo-600"><?php echo $tot_revisi; ?></h3>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Revisi</p>
                 </div>
             </div>
         </div>
@@ -185,8 +185,8 @@ $current_page = 'beranda';
                         $status_lower = strtolower($status_laporan);
                         if ($status_lower == 'disetujui' || $status_lower == 'approved' || $status_lower == 'selesai') {
                             $status_class = "bg-emerald-100 text-emerald-800 border-emerald-300";
-                        } elseif ($status_lower == 'ditolak' || $status_lower == 'rejected') {
-                            $status_class = "bg-rose-100 text-rose-800 border-rose-300";
+                        } elseif ($status_lower == 'revisi' || $status_lower == 'perlu revisi' || $status_lower == 'ditolak' || $status_lower == 'rejected') {
+                            $status_class = "bg-amber-100 text-amber-800 border-amber-300";
                         } else {
                             $status_class = "bg-amber-100 text-amber-800 border-amber-300";
                         }
@@ -200,26 +200,31 @@ $current_page = 'beranda';
                         }
                     ?>
                     <div class="animate-entry bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative transition hover:shadow-md duration-200" style="animation-delay: <?php echo $item_delay; ?>s;">
-                        <div class="flex justify-between items-center">
-                            <span class="bg-blue-50 text-[#0052cc] border border-blue-200 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#0052cc]"></span> 
-                                <?php echo htmlspecialchars($potensi); ?>
-                            </span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-bold text-slate-400"><?php echo $nomor_tiket; ?></span>
-                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border <?php echo $status_class; ?>">
+                            <!-- BARIS ATAS: Nomor Tiket & Status (Supaya Sejajar Rapi & Tidak Saling Tabrak) -->
+                            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span class="text-xs font-extrabold text-slate-500 tracking-wide flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[15px] text-blue-600">confirmation_number</span>
+                                    <?php echo $nomor_tiket; ?>
+                                </span>
+                                <span class="text-[10px] font-extrabold px-3 py-1 rounded-full border shadow-2xs <?php echo $status_class; ?>">
                                     <?php echo htmlspecialchars($status_laporan); ?>
                                 </span>
                             </div>
-                        </div>
 
-                        <div>
-                            <h3 class="font-extrabold text-sm text-[#0d1c30] leading-snug"><?php echo htmlspecialchars($row['lokasi_area']); ?></h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px] text-rose-500">location_on</span>
-                                <span><?php echo htmlspecialchars($row['lokasi_area']); ?> (<?php echo $row['latitude']; ?>, <?php echo $row['longitude']; ?>)</span>
-                            </p>
-                        </div>
+                            <!-- KONTEN TENGAH: Potensi Ancaman (Full Lebar ke Bawah agar Panjang pun Aman) -->
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-[#0052cc]"></span>
+                                    <span class="text-xs font-extrabold text-[#0052cc]">
+                                        <?php echo htmlspecialchars($potensi); ?>
+                                    </span>
+                                </div>
+                                <h3 class="font-extrabold text-sm text-[#0d1c30] leading-snug"><?php echo htmlspecialchars($row['lokasi_area']); ?></h3>
+                                <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-rose-500">location_on</span>
+                                    <span><?php echo htmlspecialchars($row['lokasi_area']); ?> (<?php echo $row['latitude']; ?>, <?php echo $row['longitude']; ?>)</span>
+                                </p>
+                            </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 grid grid-cols-2 gap-3 text-[11px] items-center">
                             <?php 

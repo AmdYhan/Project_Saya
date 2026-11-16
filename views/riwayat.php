@@ -93,11 +93,11 @@ $current_page = 'riwayat';
                     // Logika Pewarnaan Status: Disetujui = Hijau | Ditolak = Merah | Pending = Oren
                     $status_lower = strtolower($status_laporan);
                     if ($status_lower == 'disetujui' || $status_lower == 'approved' || $status_lower == 'selesai') {
-                        $status_class = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                    } elseif ($status_lower == 'ditolak' || $status_lower == 'rejected') {
-                        $status_class = "bg-rose-50 text-rose-700 border-rose-200";
+                        $status_class = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                    } elseif ($status_lower == 'revisi' || $status_lower == 'perlu revisi' || $status_lower == 'ditolak' || $status_lower == 'rejected') {
+                        $status_class = "bg-indigo-100 text-indigo-800 border-indigo-300"; // Diubah ke ungu/indigo
                     } else {
-                        $status_class = "bg-amber-50 text-amber-700 border-amber-200";
+                        $status_class = "bg-amber-100 text-amber-800 border-amber-300"; // Pending tetap kuning/amber
                     }
 
                     // Logika Pewarnaan Kondisi Fisik
