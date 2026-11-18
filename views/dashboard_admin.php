@@ -101,16 +101,16 @@ $current_page = 'dashboard';
 
         <div class="animate-entry delay-200 grid grid-cols-3 gap-2">
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm text-center transition hover:shadow-md">
-                <div class="text-rose-600 font-extrabold text-base mb-0.5"><?php echo $q_kritis; ?></div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Kritis Rawan</p>
+                <div class="text-rose-600 font-extrabold text-lg mb-0.5"><?php echo $q_kritis; ?></div>
+                <p class="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Kritis</p>
             </div>
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm text-center transition hover:shadow-md">
-                <div class="text-amber-600 font-extrabold text-base mb-0.5"><?php echo $q_waspada; ?></div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Waspada Rimbun</p>
+                <div class="text-amber-600 font-extrabold text-lg mb-0.5"><?php echo $q_waspada; ?></div>
+                <p class="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Waspada</p>
             </div>
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm text-center transition hover:shadow-md">
-                <div class="text-emerald-600 font-extrabold text-base mb-0.5"><?php echo $q_normal; ?></div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Normal Selesai</p>
+                <div class="text-emerald-600 font-extrabold text-lg mb-0.5"><?php echo $q_normal; ?></div>
+                <p class="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Aman</p>
             </div>
         </div>
 
