@@ -48,11 +48,11 @@ if ($total_giat > 0) {
     $wilayah_cakupan = "Samarinda";
 }
 
-// Set header file Excel (.xls)
-header("Content-Type: application/vnd-ms-excel");
-header("Content-Disposition: attachment; filename=Rekap_Laporan_Patroli_Lintasarta_" . date('Y-m-d') . ".xls");
-header("Pragma: no-cache");
-header("Expires: 0");
+// Nama file unik berdasarkan tanggal dan jam pembuatan
+$nama_file_excel = "Rekap_Laporan_Patroli_Lintasarta_" . date('Y-m-d_His') . ".xls";
+
+// Mulai menangkap output buffer untuk disimpan ke folder Rekap_Laporan
+ob_start();
 ?>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/1999/xlink">
 <head>
@@ -150,3 +150,28 @@ header("Expires: 0");
 
 </body>
 </html>
+<?php
+// Ambil isi HTML yang telah dirender
+$html_excel = ob_get_clean();
+
+// 1. Tentukan path folder tujuan di root project (naik satu tingkat dari folder process/ ke Rekap_Laporan/)
+$folder_tujuan = "../Rekap_Laporan/";
+
+// Pastikan folder benar-benar ada, jika belum sistem akan membuatnya otomatis
+if (!file_exists($folder_tujuan)) {
+    mkdir($folder_tujuan, 0777, true);
+}
+
+// 2. Simpan file Excel secara otomatis ke dalam folder Rekap_Laporan
+file_put_contents($folder_tujuan . $nama_file_excel, $html_excel);
+
+// 3. Set header agar file juga langsung terunduh oleh browser pengguna
+header("Content-Type: application/vnd-ms-excel");
+header("Content-Disposition: attachment; filename=" . $nama_file_excel);
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Keluarkan file ke browser
+echo $html_excel;
+exit();
+?>

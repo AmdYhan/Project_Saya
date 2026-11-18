@@ -25,6 +25,7 @@ $total_giat = mysqli_num_rows($query_laporan);
 $arr_tanggal = [];
 $arr_waktu = [];
 $lokasi_array = [];
+$data_laporan = [];
 
 while ($row = mysqli_fetch_assoc($query_laporan)) {
     $data_laporan[] = $row;
@@ -34,8 +35,6 @@ while ($row = mysqli_fetch_assoc($query_laporan)) {
     $lokasi_array[] = $row['lokasi_area'];
 }
 
-// Reset pointer query atau looping ulang dengan data_laporan array
-// Tentukan Tanggal Patroli (Jika rentang, tampilkan dari tgl awal ke tgl akhir. Jika 1 hari, tampilkan tanggal itu)
 $min_tgl = min($arr_tanggal);
 $max_tgl = max($arr_tanggal);
 if ($min_tgl === $max_tgl) {
@@ -44,17 +43,29 @@ if ($min_tgl === $max_tgl) {
     $formatted_tanggal = date('d M Y', strtotime($min_tgl)) . ' s.d. ' . date('d M Y', strtotime($max_tgl));
 }
 
-// Tentukan Waktu Operasional (Dari jam laporan paling awal ke jam laporan paling akhir)
 sort($arr_waktu);
 $min_jam = reset($arr_waktu);
 $max_jam = end($arr_waktu);
 $waktu_operasional = $min_jam . ' - ' . $max_jam . ' WITA';
 
-// Cakupan wilayah unik
 $wilayah_cakupan = implode(', ', array_unique($lokasi_array));
 if(strlen($wilayah_cakupan) > 50) {
     $wilayah_cakupan = "Samarinda & Koridor Mahakam";
 }
+
+// Nama file PDF unik berdasarkan tanggal dan jam
+$nama_file_pdf = "Rekap_Laporan_Patroli_" . date('Y-m-d_His') . ".pdf";
+
+// Path folder tujuan di root project (naik satu tingkat dari folder process/ ke Rekap_Laporan/)
+$folder_tujuan = "../Rekap_Laporan/";
+
+if (!file_exists($folder_tujuan)) {
+    mkdir($folder_tujuan, 0777, true);
+}
+
+// Catatan: Karena sistem cetak PDF menggunakan render HTML & JavaScript window.print() di browser,
+// Anda dapat menyertakan skrip otomatisasi di bawah ini atau menggunakan pustaka tambahan seperti Dompdf/MPDF jika ingin file PDF mentah langsung terbentuk di server.
+// Namun, jika menggunakan metode cetak browser, file HTML dapat direkam otomatis sebagai arsip.
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -182,5 +193,11 @@ if(strlen($wilayah_cakupan) > 50) {
         </div>
     </div>
 
+    <script>
+        // Opsional: Memunculkan dialog print secara otomatis saat halaman terbuka
+        window.onload = function() {
+            // setTimeout(() => { window.print(); }, 500);
+        };
+    </script>
 </body>
 </html>
