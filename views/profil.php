@@ -7,6 +7,7 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+// Redirect jika user memiliki hak akses admin/pimpinan/koordinator ke profil admin
 $role = strtolower(trim($_SESSION['role'] ?? ''));
 if (in_array($role, ['admin', 'pimpinan', 'koordinator', 'engginer'], true)) {
     header("Location: profil_admin.php");

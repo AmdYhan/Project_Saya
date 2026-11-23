@@ -126,7 +126,7 @@ $current_page = 'manajemen_user';
                 </a>
                 <a href="pemantauan_admin.php" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
                     <span class="material-symbols-outlined text-[20px]">map</span>
-                    Peta GIS Jalur
+                    Peta Pemantauan
                 </a>
                 <a href="laporan_admin.php" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
                     <span class="material-symbols-outlined text-[20px]">assignment</span>

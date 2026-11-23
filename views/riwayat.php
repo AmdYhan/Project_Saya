@@ -73,6 +73,33 @@ $current_page = 'riwayat';
 
     <!-- KONTEN UTAMA RIWAYAT -->
     <main class="max-w-md mx-auto p-4 space-y-3.5">
+        
+        <!-- Notifikasi Status Aksi (In-Page) -->
+        <?php if (isset($_GET['pesan'])): ?>
+            <?php 
+                $pesan_teks = '';
+                $pesan_icon = 'check_circle';
+                $pesan_class = 'bg-emerald-50 border-emerald-200 text-emerald-800';
+                
+                if ($_GET['pesan'] === 'hapus_sukses') {
+                    $pesan_teks = 'Laporan patroli berhasil dihapus dari sistem.';
+                } elseif ($_GET['pesan'] === 'revisi_sukses') {
+                    $pesan_teks = 'Laporan patroli berhasil diperbarui dan dikirim ulang untuk verifikasi.';
+                }
+            ?>
+            <?php if (!empty($pesan_teks)): ?>
+            <div id="notifRiwayat" class="animate-entry bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-[20px]">check_circle</span>
+                    <span><?php echo htmlspecialchars($pesan_teks); ?></span>
+                </div>
+                <button onclick="document.getElementById('notifRiwayat').remove()" class="text-emerald-500 hover:text-emerald-700">
+                    <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
+            </div>
+            <?php endif; ?>
+        <?php endif; ?>
+
         <div class="animate-entry delay-100 flex items-center justify-between mb-1 px-1">
             <h2 class="font-extrabold text-sm text-[#0d1c30] tracking-tight">Daftar Laporan Saya</h2>
             <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
@@ -171,10 +198,10 @@ $current_page = 'riwayat';
                             </a>
                         <?php endif; ?>
 
-                        <!-- Tombol Hapus -->
-                        <a href="../process/proses_hapus_laporan.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan patroli ini?')" class="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center transition border border-rose-100 flex-shrink-0 active:scale-[0.98]" title="Hapus Laporan">
+                        <!-- Tombol Hapus (Kustom Modal In-Page) -->
+                        <button type="button" onclick="bukaModalHapus(<?php echo $row['id']; ?>, '<?php echo $nomor_tiket; ?>')" class="w-10 h-10 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center transition border border-rose-100 flex-shrink-0 active:scale-[0.98]" title="Hapus Laporan">
                             <span class="material-symbols-outlined text-[18px]">delete</span>
-                        </a>
+                        </button>
                     </div>
 
                 </div>
@@ -214,5 +241,37 @@ $current_page = 'riwayat';
         </a>
     </nav>
 
+    <!-- MODAL POPUP KONFIRMASI HAPUS (IN-PAGE BUKAN BROWSER CONFIRM) -->
+    <div id="modalKonfirmasiHapus" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm space-y-4 shadow-2xl text-center animate-entry">
+            <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto border border-rose-100">
+                <span class="material-symbols-outlined text-[30px]">delete</span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="font-extrabold text-base text-[#0d1c30]">Hapus Laporan Ini?</h3>
+                <p id="teksModalHapus" class="text-xs text-slate-500">Tiket ini akan dihapus secara permanen dari sistem patroli.</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="tutupModalHapus()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
+                    Batal
+                </button>
+                <a id="btnTautanHapus" href="#" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition shadow-md shadow-rose-500/20 flex items-center justify-center">
+                    Ya, Hapus
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bukaModalHapus(id, noTiket) {
+            document.getElementById('teksModalHapus').textContent = "Tiket " + noTiket + " akan dihapus secara permanen.";
+            document.getElementById('btnTautanHapus').href = "../process/proses_hapus_laporan.php?id=" + id;
+            document.getElementById('modalKonfirmasiHapus').classList.remove('hidden');
+        }
+
+        function tutupModalHapus() {
+            document.getElementById('modalKonfirmasiHapus').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>

@@ -52,15 +52,22 @@ if ($foto_terpilih && $foto_terpilih['error'] == 0) {
           ('$id_teknisi', '$username', '$lokasi_area', '$latitude', '$longitude', '$akurasi_gps', '$kondisi_fisik', '$potensi_ancaman', '$catatan', 'Menunggu Verifikasi', '$nama_baru', '$tanggal')";
         
         if (mysqli_query($conn, $query)) {
+            $_SESSION['patroli_sukses'] = 'Laporan patroli berhasil dikirim! Menunggu verifikasi admin.';
             header("Location: ../views/beranda.php?status=sukses");
             exit();
         } else {
-            echo "Gagal menyimpan ke database: " . mysqli_error($conn);
+            $_SESSION['patroli_error'] = "Gagal menyimpan laporan ke database: " . mysqli_error($conn);
+            header("Location: ../views/form_patroli.php");
+            exit();
         }
     } else {
-        echo "Gagal mengunggah foto ke direktori server.";
+        $_SESSION['patroli_error'] = "Gagal mengunggah foto ke direktori server. Periksa izin folder.";
+        header("Location: ../views/form_patroli.php");
+        exit();
     }
 } else {
-    echo "Harap sertakan foto bukti lapangan (melalui kamera atau galeri).";
+    $_SESSION['patroli_error'] = "Harap sertakan foto bukti lapangan (melalui kamera atau galeri).";
+    header("Location: ../views/form_patroli.php");
+    exit();
 }
 ?>

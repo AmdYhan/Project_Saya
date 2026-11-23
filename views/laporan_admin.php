@@ -79,7 +79,7 @@ $current_page = 'laporan';
                 </a>
                 <a href="pemantauan_admin.php" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
                     <span class="material-symbols-outlined text-[20px]">map</span>
-                    Peta GIS Jalur
+                    Peta Pemantauan
                 </a>
                 <a href="laporan_admin.php" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#0052cc] text-white shadow-md">
                     <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">assignment</span>
@@ -134,6 +134,42 @@ $current_page = 'laporan';
         <!-- KONTEN SCROLLABLE -->
         <main class="flex-1 overflow-y-auto p-6 space-y-6 animate-main">
             
+            <!-- NOTIFIKASI AKSI ADMIN (IN-PAGE BUKAN ALERT) -->
+            <?php 
+            $admin_notif = null;
+            if (!empty($_SESSION['admin_notif'])) {
+                $admin_notif = $_SESSION['admin_notif'];
+                unset($_SESSION['admin_notif']);
+            } elseif (isset($_GET['pesan']) && $_GET['pesan'] === 'berhasil_revisi') {
+                $admin_notif = ['tipe' => 'sukses', 'pesan' => 'Permintaan revisi dan catatan berhasil dikirimkan ke teknisi.'];
+            }
+            ?>
+            <?php if ($admin_notif): ?>
+                <?php 
+                    $is_sukses = ($admin_notif['tipe'] === 'sukses');
+                    $bg_notif = $is_sukses ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800';
+                    $icon_notif = $is_sukses ? 'check_circle' : 'error';
+                    $icon_color = $is_sukses ? 'text-emerald-600' : 'text-rose-600';
+                ?>
+                <div id="bannerNotifAdmin" class="p-4 rounded-2xl border <?php echo $bg_notif; ?> flex items-center justify-between shadow-sm animate-main">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined <?php echo $icon_color; ?> text-[22px]"><?php echo $icon_notif; ?></span>
+                        <p class="text-xs font-extrabold"><?php echo htmlspecialchars($admin_notif['pesan']); ?></p>
+                    </div>
+                    <button onclick="document.getElementById('bannerNotifAdmin').remove()" class="text-slate-400 hover:text-slate-600">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+
+            <!-- TOAST FLOATING UNTUK PERINGATAN CHECKBOX / EKSPOR -->
+            <div id="toastAdmin" class="fixed top-6 right-6 z-50 transform translate-y-[-100px] opacity-0 pointer-events-none transition-all duration-300 ease-out">
+                <div class="bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700/80">
+                    <span class="material-symbols-outlined text-amber-400 text-[20px]" id="toastAdminIcon">warning</span>
+                    <span class="text-xs font-bold" id="toastAdminText">Notifikasi</span>
+                </div>
+            </div>
+
             <!-- 1. RINGKASAN STATISTIK ANTREAN -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
@@ -338,10 +374,35 @@ $current_page = 'laporan';
             }
         }
 
+        let toastAdminTimeout = null;
+        function tampilkanToastAdmin(pesan, tipe = 'warning') {
+            const toast = document.getElementById('toastAdmin');
+            const textEl = document.getElementById('toastAdminText');
+            const iconEl = document.getElementById('toastAdminIcon');
+
+            textEl.textContent = pesan;
+            if (tipe === 'warning') {
+                iconEl.textContent = 'warning';
+                iconEl.className = 'material-symbols-outlined text-amber-400 text-[20px]';
+            } else {
+                iconEl.textContent = 'info';
+                iconEl.className = 'material-symbols-outlined text-blue-400 text-[20px]';
+            }
+
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            if (toastAdminTimeout) clearTimeout(toastAdminTimeout);
+            toastAdminTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
         function submitAksi(jenis) {
             const checked = document.querySelectorAll('.item-check:checked');
             if (checked.length === 0) {
-                alert('Silakan pilih minimal satu laporan terlebih dahulu.');
+                tampilkanToastAdmin('Silakan centang minimal satu laporan terlebih dahulu.', 'warning');
                 return;
             }
             const form = document.getElementById('formAksi');

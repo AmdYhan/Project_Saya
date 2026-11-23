@@ -12,6 +12,13 @@ $query_user = mysqli_query($conn, "SELECT * FROM users WHERE username='$username
 $user = mysqli_fetch_assoc($query_user);
 
 $current_page = 'patroli';
+
+// Ambil pesan error jika ada dari session
+$patroli_error = '';
+if (!empty($_SESSION['patroli_error'])) {
+    $patroli_error = $_SESSION['patroli_error'];
+    unset($_SESSION['patroli_error']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -24,24 +31,11 @@ $current_page = 'patroli';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-
-        /* Animasi Masuk Bertahap (Staggered Slide Up & Fade In) */
         @keyframes slideUpFade {
-            0% {
-                opacity: 0;
-                transform: translateY(18px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            0% { opacity: 0; transform: translateY(18px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        .animate-entry {
-            opacity: 0;
-            animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
+        .animate-entry { opacity: 0; animation: slideUpFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-100 { animation-delay: 0.06s; }
         .delay-200 { animation-delay: 0.12s; }
         .delay-300 { animation-delay: 0.18s; }
@@ -53,7 +47,7 @@ $current_page = 'patroli';
 <body class="bg-[#f8fafc] text-[#0d1c30] pb-24">
 
     <!-- HEADER -->
-   <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 py-4 shadow-xs">
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 py-4 shadow-xs">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <a href="beranda.php" class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[#0d1c30] active:scale-95 transition">
@@ -74,8 +68,28 @@ $current_page = 'patroli';
     <!-- KONTEN UTAMA FORM -->
     <main class="max-w-md mx-auto p-4 space-y-4">
         
+        <!-- Notifikasi Error dari Server jika ada -->
+        <?php if (!empty($patroli_error)): ?>
+        <div class="animate-entry bg-rose-50 border border-rose-200 text-rose-700 p-3.5 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+            <span class="material-symbols-outlined text-rose-600 text-[20px] flex-shrink-0">error</span>
+            <span class="flex-1"><?php echo htmlspecialchars($patroli_error); ?></span>
+        </div>
+        <?php endif; ?>
+
+        <!-- TOAST / NOTIFIKASI POPUP IN-PAGE UNTUK VALIDASI -->
+        <div id="toastValidasi" class="fixed top-5 left-4 right-4 max-w-md mx-auto z-50 transform -translate-y-20 opacity-0 pointer-events-none transition-all duration-300 ease-out">
+            <div class="bg-slate-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700/60">
+                <div id="toastIconContainer" class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[20px]" id="toastIcon">warning</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-xs font-bold" id="toastPesan">Peringatan</p>
+                </div>
+            </div>
+        </div>
+        
         <!-- Action diarahkan ke folder process/ -->
-        <form action="../process/proses_tambah_patroli.php" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <form id="formPatroli" action="../process/proses_tambah_patroli.php" method="POST" enctype="multipart/form-data" onsubmit="return validasiFormPatroli(event)" class="space-y-4">
             
             <!-- 1. Lokasi / Segment Patroli -->
             <div class="animate-entry delay-100 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
@@ -119,9 +133,9 @@ $current_page = 'patroli';
                     </div>
                 </div>
 
-                <input type="hidden" name="latitude" id="latitude" required>
-                <input type="hidden" name="longitude" id="longitude" required>
-                <input type="hidden" name="akurasi_gps" id="akurasi_gps" required>
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+                <input type="hidden" name="akurasi_gps" id="akurasi_gps">
             </div>
             
             <!-- 3. KONDISI FISIK JALUR -->
@@ -132,7 +146,7 @@ $current_page = 'patroli';
                 </div>
                 <p class="text-[11px] text-slate-500">Pilih status inspeksi tiang/kabel di lokasi hari ini</p>
                 
-                <input type="hidden" name="kondisi_fisik" id="input_kondisi" required>
+                <input type="hidden" name="kondisi_fisik" id="input_kondisi">
 
                 <div class="grid grid-cols-3 gap-2 pt-1">
                     <button type="button" onclick="pilihKondisi('Baik')" id="btn-Baik" class="py-2.5 px-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 flex items-center justify-center gap-1 transition hover:bg-slate-100 active:scale-95">
@@ -155,7 +169,7 @@ $current_page = 'patroli';
                     <option value="Pohon Rawan Tumbang">Pohon Rawan Tumbang</option>
                     <option value="Aktivitas Galian / Konstruksi Warga">Aktivitas Galian / Konstruksi Warga</option>
                     <option value="Kabel Kendur / Mendekati Tanah">Kabel Kendur / Mendekati Tanah</option>
-                     <option value="Tiang Miring / Hampir Rebah / Patah">Tiang Miring / Hampir Rebah / Patah</option>
+                    <option value="Tiang Miring / Hampir Rebah / Patah">Tiang Miring / Hampir Rebah / Patah</option>
                     <option value="Kabel Putus / Terkelupas / Vandalisme">Kabel Putus / Terkelupas / Vandalisme</option>
                     <option value="Lainnya">Lainnya</option>
                 </select>
@@ -312,7 +326,6 @@ $current_page = 'patroli';
                 gpsIndicator.className = "absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white";
             }
 
-            // Reverse Geocoding OpenStreetMap untuk merangkai format alamat lengkap mitra
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
                 headers: { 'Accept-Language': 'id' }
             })
@@ -320,7 +333,6 @@ $current_page = 'patroli';
             .then(data => {
                 if (data && data.address) {
                     const addr = data.address;
-                    
                     let jalan = addr.road || addr.suburb || addr.hamlet || '';
                     let desaKel = addr.village || addr.town || addr.city_district || addr.suburb || '';
                     let kecamatan = addr.county || addr.state_district || addr.municipality || '';
@@ -391,6 +403,64 @@ $current_page = 'patroli';
                 }
                 reader.readAsDataURL(fileInput.files[0]);
             }
+        }
+
+        let toastTimeout = null;
+        function tampilkanToastValidasi(pesan) {
+            const toast = document.getElementById('toastValidasi');
+            const pesanEl = document.getElementById('toastPesan');
+            pesanEl.textContent = pesan;
+
+            toast.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 4000);
+        }
+
+        function validasiFormPatroli(event) {
+            const lokasi = document.getElementById('lokasi_area').value.trim();
+            const lat = document.getElementById('latitude').value.trim();
+            const lon = document.getElementById('longitude').value.trim();
+            const kondisi = document.getElementById('input_kondisi').value.trim();
+            const fotoKamera = document.getElementById('foto_kamera').files;
+            const fotoGaleri = document.getElementById('foto_galeri').files;
+
+            if (!lokasi) {
+                tampilkanToastValidasi("Harap isi deskripsi Lokasi / Area Patroli.");
+                document.getElementById('lokasi_area').focus();
+                event.preventDefault();
+                return false;
+            }
+
+            if (!lat || !lon) {
+                tampilkanToastValidasi("Titik koordinat GPS belum terkunci. Klik tombol 'Perbarui' GPS.");
+                window.scrollTo({ top: 150, behavior: 'smooth' });
+                event.preventDefault();
+                return false;
+            }
+
+            if (!kondisi) {
+                tampilkanToastValidasi("Harap pilih Kondisi Fisik Jalur (Baik, Waspada, atau Rawan).");
+                window.scrollTo({ top: 320, behavior: 'smooth' });
+                event.preventDefault();
+                return false;
+            }
+
+            if ((!fotoKamera || fotoKamera.length === 0) && (!fotoGaleri || fotoGaleri.length === 0)) {
+                tampilkanToastValidasi("Harap lampirkan foto bukti patroli (Kamera atau Galeri).");
+                window.scrollTo({ top: 600, behavior: 'smooth' });
+                event.preventDefault();
+                return false;
+            }
+
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> Mengirim Laporan...`;
+            return true;
         }
     </script>
 

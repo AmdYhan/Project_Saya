@@ -7,31 +7,34 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Jika role admin, arahkan ke dashboard admin
-if (isset($_SESSION['role']) && ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'koordinator' || $_SESSION['role'] == 'engginer')) {
-    header("Location: dashboard_admin.php");
-    exit();
-}
+$role = strtolower(trim($_SESSION['role'] ?? ''));
 
-$username = $_SESSION['username']; 
-$query_user = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'"); 
-$user = mysqli_fetch_assoc($query_user); 
-$id_teknisi = $user['id'] ?? 0; 
+// Beranda TIDAK lagi memaksa redirect ke dashboard admin.
+// Redirect paksa inilah penyebab tombol Beranda di navigasi bawah "melempar"
+// user ber-role admin/koordinator/engginer ke dashboard admin.
+// Arah awal sesuai role tetap diatur oleh login (proses_login.php).
+// Role level admin hanya diberi tombol pintasan ke dashboard (lihat header).
+$role_admin_level = ['admin', 'pimpinan', 'koordinator', 'engginer'];
+$boleh_ke_dashboard = in_array($role, $role_admin_level, true);
 
-// Statistik status laporan 
-$q_approved = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Disetujui' OR status_laporan = 'Approved')"); 
-$q_pending = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Menunggu Verifikasi' OR status_laporan = 'Pending' OR status_laporan = '')"); 
-$q_revisi = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Revisi' OR status_laporan = 'Perlu Revisi' OR status_laporan = 'Ditolak' OR status_laporan = 'Rejected')"); 
+$username = $_SESSION['username'];
+$query_user = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
+$user = mysqli_fetch_assoc($query_user);
+$id_teknisi = $user['id'] ?? 0;
 
-$tot_approved = ($q_approved) ? (mysqli_fetch_assoc($q_approved)['total'] ?? 0) : 0; 
-$tot_pending = ($q_pending) ? (mysqli_fetch_assoc($q_pending)['total'] ?? 0) : 0; 
-$tot_revisi = ($q_revisi) ? (mysqli_fetch_assoc($q_revisi)['total'] ?? 0) : 0; 
+// Statistik status laporan
+$q_approved = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Disetujui' OR status_laporan = 'Approved')");
+$q_pending = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Menunggu Verifikasi' OR status_laporan = 'Pending' OR status_laporan = '')");
+$q_revisi = mysqli_query($conn, "SELECT COUNT(*) AS total FROM laporan_patroli WHERE username = '$username' AND (status_laporan = 'Revisi' OR status_laporan = 'Perlu Revisi' OR status_laporan = 'Ditolak' OR status_laporan = 'Rejected')");
+
+$tot_approved = ($q_approved) ? (mysqli_fetch_assoc($q_approved)['total'] ?? 0) : 0;
+$tot_pending = ($q_pending) ? (mysqli_fetch_assoc($q_pending)['total'] ?? 0) : 0;
+$tot_revisi = ($q_revisi) ? (mysqli_fetch_assoc($q_revisi)['total'] ?? 0) : 0;
 
 // Ambil riwayat laporan terbaru (maksimal 3) beserta data NIP user
-$query_riwayat = mysqli_query($conn, "SELECT l.*, u.nip FROM laporan_patroli l LEFT JOIN users u ON l.username = u.username WHERE l.username='$username' ORDER BY l.id DESC LIMIT 3"); 
-$current_page = 'beranda'; 
+$query_riwayat = mysqli_query($conn, "SELECT l.*, u.nip FROM laporan_patroli l LEFT JOIN users u ON l.username = u.username WHERE l.username='$username' ORDER BY l.id DESC LIMIT 3");
+$current_page = 'beranda';
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -79,15 +82,50 @@ $current_page = 'beranda';
                 </div>
             </div>
             
-            <a href="profil.php" class="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0052cc] shadow-xs active:scale-95 transition">
-                <span class="material-symbols-outlined text-[22px]">person</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <?php if ($boleh_ke_dashboard): ?>
+                <a href="dashboard_admin.php" title="Ke Dashboard Admin" class="h-10 px-3 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center gap-1 text-indigo-700 text-[11px] font-extrabold shadow-xs active:scale-95 transition">
+                    <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                    Admin
+                </a>
+                <?php endif; ?>
+                <a href="profil.php" class="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0052cc] shadow-xs active:scale-95 transition">
+                    <span class="material-symbols-outlined text-[22px]">person</span>
+                </a>
+            </div>
         </div>
     </header>
 
     <!-- KONTEN UTAMA -->
     <main class="max-w-md mx-auto p-4 space-y-4">
         
+        <!-- Notifikasi Sukses Simpan Patroli (In-Page) -->
+        <?php 
+        $pesan_sukses = '';
+        if (isset($_GET['status']) && $_GET['status'] === 'sukses') {
+            $pesan_sukses = 'Laporan patroli Anda berhasil dikirim dan menunggu verifikasi admin.';
+        } elseif (!empty($_SESSION['patroli_sukses'])) {
+            $pesan_sukses = $_SESSION['patroli_sukses'];
+            unset($_SESSION['patroli_sukses']);
+        }
+        ?>
+        <?php if (!empty($pesan_sukses)): ?>
+        <div id="notifBeranda" class="animate-entry bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 text-emerald-700">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                </div>
+                <div>
+                    <p class="font-extrabold text-emerald-900"><?php echo htmlspecialchars($pesan_sukses); ?></p>
+                    <p class="text-[10px] text-emerald-600 font-medium">Data telah tercatat di riwayat laporan.</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('notifBeranda').remove()" class="text-emerald-500 hover:text-emerald-700 p-1">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+        <?php endif; ?>
+
         <!-- 1. KARTU PROFIL TEKNISI (MUNCUL PERTAMA) -->
         <div class="animate-entry delay-100 relative bg-gradient-to-r from-[#0052cc] via-blue-600 to-indigo-700 text-white rounded-2xl p-4 shadow-md shadow-blue-500/20 overflow-hidden flex items-center justify-between">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
@@ -144,7 +182,7 @@ $current_page = 'beranda';
                 </div>
                 <div>
                     <h3 class="font-extrabold text-base text-indigo-600"><?php echo $tot_revisi; ?></h3>
-                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Revisi</p>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Revision</p>
                 </div>
             </div>
         </div>
@@ -288,4 +326,4 @@ $current_page = 'beranda';
     </nav>
 
 </body>
-</html>  
+</html>

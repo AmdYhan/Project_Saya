@@ -130,12 +130,10 @@ $current_page = 'dashboard';
             </div>
             
             <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-500 font-medium bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                    📅 <?php echo date('d M Y'); ?>
+                <span class="text-xs text-slate-600 font-bold bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs">
+                    <span class="material-symbols-outlined text-[16px] text-[#0052cc]">calendar_today</span>
+                    <?php echo date('d M Y'); ?>
                 </span>
-                <a href="cetak_pdf.php" target="_blank" class="bg-[#0052cc] hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition">
-                    <span class="material-symbols-outlined text-[16px]">print</span> Cetak Laporan PDF
-                </a>
             </div>
         </header>
 
@@ -232,7 +230,7 @@ $current_page = 'dashboard';
                                 <span class="material-symbols-outlined text-[20px]">map</span>
                             </div>
                             <div>
-                                <h4 class="font-bold text-xs text-[#0d1c30] group-hover:text-[#0052cc] transition">Peta GIS Interaktif</h4>
+                                <h4 class="font-bold text-xs text-[#0d1c30] group-hover:text-[#0052cc] transition">Peta Pemantauan</h4>
                                 <p class="text-[11px] text-slate-400">Pantau titik koordinat lapangan</p>
                             </div>
                         </a>
