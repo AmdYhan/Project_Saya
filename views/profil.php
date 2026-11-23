@@ -7,6 +7,12 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
+$role = strtolower(trim($_SESSION['role'] ?? ''));
+if (in_array($role, ['admin', 'pimpinan', 'koordinator', 'engginer'], true)) {
+    header("Location: profil_admin.php");
+    exit();
+}
+
 $username = $_SESSION['username'];
 $query_user = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
 $user = mysqli_fetch_assoc($query_user);
