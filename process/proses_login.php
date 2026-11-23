@@ -1,11 +1,9 @@
 <?php
 session_start();
 include "../config/koneksi.php";
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
-
     // Ambil data user dari database
     $query = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username' AND password = '$password'");
     
@@ -33,11 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
     } else {
-        // Jika gagal login
-        echo "<script>
-                alert('Username atau Password salah!');
-                window.location.href='../views/login.php';
-              </script>";
+        // Jika gagal login — simpan pesan error ke session, BUKAN alert browser
+        $_SESSION['login_error'] = 'Username atau Password salah!';
+        header("Location: ../views/login.php");
         exit();
     }
 } else {

@@ -11,6 +11,13 @@ if (isset($_SESSION['username'])) {
         exit();
     }
 }
+
+// Ambil pesan error dari session (jika ada)
+$login_error = '';
+if (!empty($_SESSION['login_error'])) {
+    $login_error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -29,7 +36,6 @@ if (isset($_SESSION['username'])) {
             background-size: 24px 24px;
         }
 
-        /* Animasi mengambang halus pada gambar ilustrasi desktop */
         @keyframes gentleFloat {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-6px); }
@@ -37,7 +43,6 @@ if (isset($_SESSION['username'])) {
         }
         .animate-float { animation: gentleFloat 4.5s ease-in-out infinite; }
         
-        /* Keyframes untuk Animasi Masuk Halaman Login */
         @keyframes fadeInSlide {
             0% {
                 opacity: 0;
@@ -53,7 +58,18 @@ if (isset($_SESSION['username'])) {
             animation: fadeInSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Custom Scrollbar tipis */
+        /* Animasi notifikasi error */
+        @keyframes shakeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            30% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            70% { transform: translateX(-3px); }
+            100% { opacity: 1; transform: translateY(0) translateX(0); }
+        }
+        .animate-shake-in {
+            animation: shakeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 9999px; }
     </style>
@@ -68,7 +84,7 @@ if (isset($_SESSION['username'])) {
     <!-- KONTAINER UTAMA -->
     <div class="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-5xl bg-white md:rounded-[32px] rounded-3xl shadow-2xl shadow-slate-950/40 border border-white/20 overflow-hidden flex flex-col md:flex-row my-auto max-h-[96vh] md:max-h-[750px] animate-fade-in">
         
-        <!-- SISI KIRI: GAMBAR ILUSTRASI 2D (Hanya muncul di Layar Desktop/Laptop, disembunyikan di Mobile) -->
+        <!-- SISI KIRI: GAMBAR ILUSTRASI 2D -->
         <div class="hidden md:flex md:w-1/2 bg-gradient-to-tr from-[#061838] to-[#004fcc] p-8 flex-col justify-between items-center text-white relative overflow-hidden border-r border-slate-100 flex-shrink-0">
             <div class="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none"></div>
             
@@ -88,11 +104,11 @@ if (isset($_SESSION['username'])) {
             </div>
         </div>
 
-        <!-- SISI KANAN / SELURUHNYA DI MOBILE: FORM LOGIN -->
+        <!-- SISI KANAN: FORM LOGIN -->
         <div class="w-full md:w-1/2 p-5 sm:p-7 lg:p-10 flex flex-col justify-center overflow-y-auto bg-white/95 backdrop-blur-md">
             <div class="w-full max-w-md mx-auto space-y-4">
                 
-                <!-- Logo & Header (Bersih & Proporsional di Mobile) -->
+                <!-- Logo & Header -->
                 <div class="text-center md:text-left space-y-1">
                     <div class="flex justify-center md:justify-start items-center py-1">
                         <img src="../assets/img/Lintasarta_logo.png" alt="Logo Lintasarta" class="h-10 sm:h-12 w-auto object-contain">
@@ -101,13 +117,25 @@ if (isset($_SESSION['username'])) {
                     <p class="text-[11px] sm:text-xs text-slate-400 font-medium">Sistem Patroli & Monitoring OSP</p>
                 </div>
 
+                <!-- NOTIFIKASI ERROR LOGIN (IN-PAGE, BUKAN ALERT BROWSER) -->
+                <?php if (!empty($login_error)): ?>
+                <div id="notifError" class="animate-shake-in bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                    <div class="w-8 h-8 bg-rose-100 rounded-xl flex items-center justify-center flex-shrink-0 border border-rose-200">
+                        <span class="material-symbols-outlined text-[18px] text-rose-600">error</span>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-rose-800 text-xs"><?php echo htmlspecialchars($login_error); ?></p>
+                        <p class="text-[10px] text-rose-500 font-medium mt-0.5">Silakan periksa kembali data login Anda.</p>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- FORM LOGIN -->
                 <form action="../process/proses_login.php" method="POST" class="space-y-3.5 sm:space-y-4">
                     
-                    <!-- Input Tersembunyi Role -->
                     <input type="hidden" name="selected_role" id="selectedRole" value="teknisi">
 
-                    <!-- Tab Switcher dengan Animasi Bergeser -->
+                    <!-- Tab Switcher -->
                     <div class="relative flex bg-slate-100 p-1 rounded-2xl">
                         <div id="sliderPill" class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-[#0052cc] rounded-xl shadow-md transition-all duration-300 ease-in-out left-1"></div>
 
@@ -201,6 +229,17 @@ if (isset($_SESSION['username'])) {
                 passwordInput.type = 'password';
                 eyeIcon.textContent = 'visibility';
             }
+        }
+
+        // Auto-hide notifikasi error setelah 6 detik
+        const errorNotif = document.getElementById('notifError');
+        if (errorNotif) {
+            setTimeout(() => {
+                errorNotif.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                errorNotif.style.opacity = '0';
+                errorNotif.style.transform = 'translateY(-10px)';
+                setTimeout(() => errorNotif.remove(), 400);
+            }, 6000);
         }
     </script>
 </body>
